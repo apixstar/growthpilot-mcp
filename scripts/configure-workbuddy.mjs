@@ -10,11 +10,19 @@ export const bridgeArgs = serverUrl => [serverUrl, '--transport', 'http-only', '
 export const connectionEntry = (serverUrl, launcher = 'npx') => ({command: launcher, args: ['-y', bridgePackage, ...bridgeArgs(serverUrl)]});
 const object = value => value !== null && typeof value === 'object' && !Array.isArray(value);
 
-export function configure({configPath = join(homedir(), '.workbuddy', 'mcp.json'), serverUrl = 'https://grow.apixstar.com/mcp', launcher = process.platform === 'win32' ? 'npx.cmd' : 'npx'} = {}) {
+export function resolveConfigPath({configPath, configDir = process.env.WORKBUDDY_CONFIG_DIR, homeDir = homedir()} = {}) {
+  if (configPath) return resolve(configPath);
+  if (configDir?.trim()) return resolve(configDir.trim(), 'mcp.json');
+  const candidates = ['.workbuddy', '.workbuddy-ai'].map(name => join(homeDir, name)).filter(existsSync);
+  if (candidates.length !== 1) throw new Error('Confirm Configuration File Path in WorkBuddy → Connectors → Custom connectors → Add MCP, then pass --config. Multiple or no WorkBuddy configuration directories were found; no file was changed.');
+  return join(candidates[0], 'mcp.json');
+}
+
+export function configure({configPath, serverUrl = 'https://grow.apixstar.com/mcp', launcher = process.platform === 'win32' ? 'npx.cmd' : 'npx'} = {}) {
   const url = new URL(serverUrl);
   if (url.protocol !== 'https:' || url.pathname !== '/mcp' || url.username || url.password || url.search || url.hash) throw new Error('Use the HTTPS /mcp endpoint from the installation guide.');
   serverUrl = url.href;
-  configPath = resolve(configPath);
+  configPath = resolveConfigPath({configPath});
   if (!existsSync(dirname(configPath))) throw new Error('WorkBuddy configuration directory is missing. Confirm the active path in WorkBuddy, then pass --config.');
   // Follow an existing settings symlink instead of replacing it.
   if (existsSync(configPath)) configPath = realpathSync(configPath);
@@ -44,7 +52,12 @@ export function configure({configPath = join(homedir(), '.workbuddy', 'mcp.json'
       renameSync(temporary, configPath);
     } finally { if (existsSync(temporary)) unlinkSync(temporary); }
   }
-  return {status: 'configured_not_authorized', configPath, backup, login: {command: launcher, args: ['--yes', '--package=' + bridgePackage, 'mcp-remote-client', ...bridgeArgs(serverUrl)]}, next: 'Run the login command, complete browser authorization, verify tools/list, then load the connector in a fresh WorkBuddy task.'};
+  return {
+    status: 'configured_client_load_pending', configPath, backup,
+    authentication: 'not_checked', clientLoad: 'not_checked',
+    login: {command: launcher, args: ['--yes', '--package=' + bridgePackage, 'mcp-remote-client', ...bridgeArgs(serverUrl)]},
+    next: 'Verify OAuth once, then open WorkBuddy → Experts · Skills · Connectors → Connectors → Custom connectors → Add MCP. Confirm Configuration File Path matches configPath, reload the latest file in the editor and save it there to refresh the running client. Preserve every other server. Complete any Trust prompt through WorkBuddy, confirm GrowthPilot and its tools appear in MCP Server Management, then verify a callable tool in the conversation. A new task alone may not reload a file edited outside WorkBuddy. list_installed_plugins is not the inventory of custom MCP servers.'
+  };
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {

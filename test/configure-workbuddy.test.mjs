@@ -1,11 +1,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, readFileSync, writeFileSync, rmSync, readdirSync, symlinkSync, lstatSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, rmSync, readdirSync, symlinkSync, lstatSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { configure, connectionEntry } from '../scripts/configure-workbuddy.mjs';
+import { configure, connectionEntry, resolveConfigPath } from '../scripts/configure-workbuddy.mjs';
 
 const endpoint = 'https://grow.apixstar.com/mcp';
 function fixture(t, contents) {
@@ -24,7 +24,9 @@ test('backs up existing settings without exposing credentials and preserves unre
   const updated = JSON.parse(readFileSync(configPath, 'utf8'));
   assert.deepEqual(updated.custom, {enabled: true});
   assert.deepEqual(updated.mcpServers.existing, JSON.parse(original).mcpServers.existing);
-  assert.equal(result.status, 'configured_not_authorized');
+  assert.equal(result.status, 'configured_client_load_pending');
+  assert.equal(result.authentication, 'not_checked');
+  assert.equal(result.clientLoad, 'not_checked');
   assert.ok(result.login.args.includes('mcp-remote-client'));
   assert.ok(!JSON.stringify(result).includes('fixture-secret'));
 });
@@ -88,6 +90,28 @@ test('standalone CLI and published JSON agree with the installation guide', t =>
   const {configPath} = fixture(t);
   const child = spawnSync(process.execPath, [fileURLToPath(new URL('../scripts/configure-workbuddy.mjs', import.meta.url)), '--config', configPath, '--server-url', endpoint], {encoding: 'utf8'});
   assert.equal(child.status, 0, child.stderr);
-  assert.equal(JSON.parse(child.stdout).status, 'configured_not_authorized');
+  assert.equal(JSON.parse(child.stdout).status, 'configured_client_load_pending');
   assert.ok(JSON.parse(readFileSync(configPath, 'utf8')).mcpServers.growthpilot);
+});
+
+test('resolves either WorkBuddy edition without creating a second configuration directory', t => {
+  for (const edition of ['.workbuddy', '.workbuddy-ai']) {
+    const {directory: homeDir} = fixture(t);
+    mkdirSync(join(homeDir, edition));
+    assert.equal(resolveConfigPath({homeDir, configDir: ''}), join(homeDir, edition, 'mcp.json'));
+    assert.deepEqual(readdirSync(homeDir), [edition]);
+  }
+});
+
+test('requires the active settings path when both editions or neither edition exist', t => {
+  const {directory: homeDir} = fixture(t);
+  assert.throws(() => resolveConfigPath({homeDir, configDir: ''}), /pass --config/);
+  mkdirSync(join(homeDir, '.workbuddy'));
+  mkdirSync(join(homeDir, '.workbuddy-ai'));
+  assert.throws(() => resolveConfigPath({homeDir, configDir: ''}), /pass --config/);
+  const configPath = join(homeDir, '.workbuddy-ai', 'mcp.json');
+  assert.equal(resolveConfigPath({homeDir, configDir: join(homeDir, '.workbuddy')}), join(homeDir, '.workbuddy', 'mcp.json'));
+  assert.equal(resolveConfigPath({homeDir, configDir: join(homeDir, '.workbuddy'), configPath}), configPath);
+  assert.deepEqual(readdirSync(join(homeDir, '.workbuddy')), []);
+  assert.deepEqual(readdirSync(join(homeDir, '.workbuddy-ai')), []);
 });

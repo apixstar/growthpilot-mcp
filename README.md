@@ -59,15 +59,15 @@ Restart the Claude Code session, open `/mcp`, select GrowthPilot and authenticat
 Follow the [WorkBuddy guide](https://grow.apixstar.com/workbuddy) in a local task with Node.js LTS available. The AI should execute configuration, browser login and verification instead of stopping at instructions. From this repository:
 
 ```sh
-node scripts/configure-workbuddy.mjs
+node scripts/configure-workbuddy.mjs --config "/absolute/path/shown/by/WorkBuddy/mcp.json"
 npx --yes --package=mcp-remote@0.15.1 mcp-remote-client https://grow.apixstar.com/mcp --transport http-only --auth-timeout 300
 ```
 
-The first command backs up and merges only GrowthPilot into the active `~/.workbuddy/mcp.json`. Pass `--config` for a different confirmed settings file or `--launcher` for the absolute npx executable. It reports `configured_not_authorized` and the exact login command. It does not log in or claim that installation is complete.
+Before running the first command, replace `--config` with Configuration File Path from WorkBuddy's Connectors → Custom connectors → Add MCP editor. Depending on the edition, it may be `~/.workbuddy/mcp.json` or `~/.workbuddy-ai/mcp.json`. The script backs up and merges only GrowthPilot. Without `--config`, it uses `WORKBUDDY_CONFIG_DIR` or the single existing edition directory; it refuses to guess when both directories exist. Pass `--launcher` for the absolute npx executable if needed. It reports `configured_client_load_pending`, with authentication and client loading both `not_checked`, and the exact login command.
 
 The second command starts browser OAuth and lists tools through the same `mcp-remote@0.15.1` bridge used by [clients/workbuddy.json](clients/workbuddy.json). Keep it running while the user signs in and approves access. Inspect the actual tools list; a successful process exit alone is insufficient. Tokens stay in the bridge's local OAuth cache and refresh automatically. Use the same user account, endpoint and cache environment in WorkBuddy.
 
-Enable GrowthPilot in WorkBuddy, load a new task and verify the tools there before claiming the client is connected. Reuse an existing working native OAuth connection instead of installing a duplicate. See the full guide for Windows commands and the ready-to-paste verification prompt.
+After an external file edit, reload the latest configuration in Connectors → Custom connectors → Add MCP and save it through WorkBuddy to refresh the running client's configuration. Preserve every other server. Complete Trust/Enable in MCP Server Management and confirm GrowthPilot's tools appear. A new task alone may still use the old configuration. Check actual callable MCP tools in the conversation, then call `growthpilot_account_get` if available. `list_installed_plugins` lists connector plugins and cannot establish whether a custom MCP server is loaded. If terminal OAuth and tools already work, resume at this client-loading step instead of reinstalling or repeating login. Reuse an existing working native OAuth connection. See the full guide for Windows commands and the handoff prompt if a fresh task is needed.
 
 Validate the configuration helper without accessing real user settings: `node --test test/configure-workbuddy.test.mjs`.
 
