@@ -56,20 +56,19 @@ Restart the Claude Code session, open `/mcp`, select GrowthPilot and authenticat
 
 ## WorkBuddy
 
-Follow the [WorkBuddy guide](https://grow.apixstar.com/workbuddy) in a local task with Node.js LTS available. The AI should execute configuration, browser login and verification instead of stopping at instructions. From this repository:
+The [WorkBuddy guide](https://grow.apixstar.com/workbuddy) installs a direct HTTP connection using OAuth DCR, PKCE S256, a localhost browser callback and a Bearer header. Node.js LTS is needed only for setup and token refresh; no MCP bridge runs afterward.
 
 ```sh
 node scripts/configure-workbuddy.mjs --config "/absolute/path/shown/by/WorkBuddy/mcp.json"
-npx --yes --package=mcp-remote@0.15.1 mcp-remote-client https://grow.apixstar.com/mcp --transport http-only --auth-timeout 300
 ```
 
-Before running the first command, replace `--config` with Configuration File Path from WorkBuddy's Connectors → Custom connectors → Add MCP editor. Depending on the edition, it may be `~/.workbuddy/mcp.json` or `~/.workbuddy-ai/mcp.json`. The script backs up and merges only GrowthPilot. Without `--config`, it uses `WORKBUDDY_CONFIG_DIR` or the single existing edition directory; it refuses to guess when both directories exist. Pass `--launcher` for the absolute npx executable if needed. It reports `configured_client_load_pending`, with authentication and client loading both `not_checked`, and the exact login command.
+Use Configuration File Path from WorkBuddy's Connectors → Custom connectors → Add MCP editor. Depending on the edition, it may be `~/.workbuddy/mcp.json` or `~/.workbuddy-ai/mcp.json`. The helper refuses ambiguous paths, preserves unrelated settings, backs up the original config, verifies HTTP tools and writes `type: "http"`. Credentials are stored privately beside the config; they are never printed. Keep the command running while the user signs in and grants access. An existing bridge grant can be migrated with `--import-mcp-remote "/absolute/cache/prefix"` (without `_tokens.json`); the helper validates the issuer before reuse.
 
-The second command starts browser OAuth and lists tools through the same `mcp-remote@0.15.1` bridge used by [clients/workbuddy.json](clients/workbuddy.json). Keep it running while the user signs in and approves access. Inspect the actual tools list; a successful process exit alone is insufficient. Tokens stay in the bridge's local OAuth cache and refresh automatically. Use the same user account, endpoint and cache environment in WorkBuddy.
+The result `configured_client_load_pending` means OAuth and HTTP passed, but WorkBuddy loading remains unverified. Start a fresh WorkBuddy conversation and invoke `growthpilot_account_get` through its actual MCP tool. If unavailable, use supported client refresh or reopen/save the latest configuration in WorkBuddy, inspect Trust/Enable, then test again. Use available permitted tools; ask for user action only for a specific capability limit or user-only confirmation. Never write trust records or use private IPC. A terminal check or `list_installed_plugins` is not evidence of a callable custom MCP.
 
-The agent should finish client loading with an exposed MCP-management action or permitted desktop control, rather than hand over step 4 by default. After an external file edit, reload the latest configuration in Connectors → Custom connectors → Add MCP and save it through WorkBuddy, preserving every other server. Inspect Trust/Enable in MCP Server Management; ask for confirmation only when the host requires it from the user. If the task lacks a permitted control tool, explain that specific limitation and request the minimum remaining action, then resume verification. Zero interaction cannot be guaranteed for every client. A new task alone may still use the old configuration. Check actual callable MCP tools in the conversation, then call `growthpilot_account_get` if available. `list_installed_plugins` lists connector plugins and cannot establish whether a custom MCP server is loaded. If terminal OAuth and tools already work, resume at this client-loading step instead of reinstalling or repeating login. Reuse an existing working native OAuth connection. See the full guide for Windows commands and the handoff prompt if a fresh task is needed.
+Access tokens expire within **15 minutes**. Static HTTP headers do not auto-refresh. Rerun the helper with `--refresh`, reload the updated config in WorkBuddy and verify again. Use `--login` if the grant expired or was revoked. This direct HTTP workflow does not promise unattended long-term token renewal.
 
-Validate the configuration helper without accessing real user settings: `node --test test/configure-workbuddy.test.mjs`.
+Validate the helper: `node --test test/configure-workbuddy.test.mjs` (local loopback sockets required for OAuth callback tests).
 
 ## Trae Work
 
