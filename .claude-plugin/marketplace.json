@@ -1,0 +1,13 @@
+{
+  "name": "apixstar",
+  "owner": { "name": "Apixstar" },
+  "metadata": { "description": "MCP plugins for GrowthPilot website research." },
+  "plugins": [
+    {
+      "name": "growthpilot",
+      "source": "./plugins/growthpilot",
+      "description": "Website traffic, keyword and audience research through GrowthPilot MCP.",
+      "version": "1.0.0"
+    }
+  ]
+}

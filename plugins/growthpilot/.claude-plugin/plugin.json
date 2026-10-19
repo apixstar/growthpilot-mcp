@@ -1,0 +1,9 @@
+{
+  "name": "growthpilot",
+  "version": "1.0.0",
+  "description": "Website traffic, keywords and audiences in your AI conversation. Connect your GrowthPilot account with OAuth.",
+  "author": { "name": "Apixstar", "url": "https://github.com/apixstar" },
+  "homepage": "https://grow.apixstar.com/connect",
+  "repository": "https://github.com/apixstar/growthpilot-mcp",
+  "mcpServers": "./.mcp.json"
+}

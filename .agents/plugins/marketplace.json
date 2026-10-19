@@ -1,0 +1,12 @@
+{
+  "name": "apixstar",
+  "interface": { "displayName": "Apixstar" },
+  "plugins": [
+    {
+      "name": "growthpilot",
+      "source": { "source": "local", "path": "./plugins/growthpilot" },
+      "policy": { "installation": "AVAILABLE", "authentication": "ON_INSTALL" },
+      "category": "Productivity"
+    }
+  ]
+}
