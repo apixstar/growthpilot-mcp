@@ -1,0 +1,93 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { mkdtempSync, readFileSync, writeFileSync, rmSync, readdirSync, symlinkSync, lstatSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import { configure, connectionEntry } from '../scripts/configure-workbuddy.mjs';
+
+const endpoint = 'https://grow.apixstar.com/mcp';
+function fixture(t, contents) {
+  const directory = mkdtempSync(join(tmpdir(), 'growthpilot-workbuddy-test-'));
+  t.after(() => rmSync(directory, {recursive: true, force: true}));
+  const configPath = join(directory, 'mcp.json');
+  if (contents !== undefined) writeFileSync(configPath, contents);
+  return {directory, configPath};
+}
+
+test('backs up existing settings without exposing credentials and preserves unrelated entries', t => {
+  const original = JSON.stringify({custom: {enabled: true}, mcpServers: {existing: {url: 'https://example.com/mcp', headers: {Authorization: 'fixture-secret'}}}});
+  const {configPath} = fixture(t, original);
+  const result = configure({configPath});
+  assert.equal(readFileSync(result.backup, 'utf8'), original);
+  const updated = JSON.parse(readFileSync(configPath, 'utf8'));
+  assert.deepEqual(updated.custom, {enabled: true});
+  assert.deepEqual(updated.mcpServers.existing, JSON.parse(original).mcpServers.existing);
+  assert.equal(result.status, 'configured_not_authorized');
+  assert.ok(result.login.args.includes('mcp-remote-client'));
+  assert.ok(!JSON.stringify(result).includes('fixture-secret'));
+});
+
+test('creates an absent file in a confirmed directory and is idempotent', t => {
+  const {directory, configPath} = fixture(t);
+  assert.equal(configure({configPath}).backup, null);
+  const saved = readFileSync(configPath, 'utf8');
+  assert.equal(configure({configPath}).backup, null);
+  assert.equal(readFileSync(configPath, 'utf8'), saved);
+  assert.deepEqual(readdirSync(directory), ['mcp.json']);
+});
+
+test('rejects malformed config, name conflicts and duplicate endpoints without writing', t => {
+  for (const original of ['{broken', '[]', '{"mcpServers":[]}', JSON.stringify({mcpServers: {growthpilot: {url: 'https://other.example/mcp'}}}), JSON.stringify({mcpServers: {anotherName: {url: endpoint}}})]) {
+    const {directory, configPath} = fixture(t, original);
+    assert.throws(() => configure({configPath}));
+    assert.equal(readFileSync(configPath, 'utf8'), original);
+    assert.deepEqual(readdirSync(directory), ['mcp.json']);
+  }
+});
+
+test('switches the existing GrowthPilot entry with a backup and removes its stale bearer header', t => {
+  const original = JSON.stringify({mcpServers: {growthpilot: {type: 'streamableHttp', url: endpoint, headers: {Authorization: 'fixture-old-token'}}}});
+  const {configPath} = fixture(t, original);
+  const result = configure({configPath});
+  assert.equal(readFileSync(result.backup, 'utf8'), original);
+  assert.deepEqual(JSON.parse(readFileSync(configPath, 'utf8')).mcpServers.growthpilot, connectionEntry(endpoint));
+});
+
+test('retains a settings symlink', t => {
+  const {directory, configPath} = fixture(t, '{}');
+  const linked = join(directory, 'linked.json');
+  symlinkSync(configPath, linked);
+  configure({configPath: linked});
+  assert.ok(lstatSync(linked).isSymbolicLink());
+  assert.ok(JSON.parse(readFileSync(configPath, 'utf8')).mcpServers.growthpilot);
+});
+
+test('keeps alternate deployment and executable paths in both login and server configuration', t => {
+  const {configPath} = fixture(t);
+  const serverUrl = 'https://growthpilot-checkout-test.986882074.workers.dev/mcp', launcher = '/custom node/bin/npx';
+  const result = configure({configPath, serverUrl, launcher});
+  const entry = JSON.parse(readFileSync(configPath, 'utf8')).mcpServers.growthpilot;
+  assert.equal(entry.command, launcher);
+  assert.equal(result.login.command, launcher);
+  assert.ok(entry.args.includes(serverUrl) && result.login.args.includes(serverUrl));
+  assert.ok(!JSON.stringify(result).includes('grow.apixstar.com'));
+});
+
+test('refuses unknown directories and unsafe endpoint forms', t => {
+  const {directory, configPath} = fixture(t);
+  assert.throws(() => configure({configPath: join(directory, 'missing', 'mcp.json')}), /directory is missing/);
+  for (const serverUrl of ['http://example.com/mcp', 'https://secret@example.com/mcp', 'https://example.com/mcp?token=secret']) assert.throws(() => configure({configPath, serverUrl}));
+  assert.deepEqual(readdirSync(directory), []);
+});
+
+test('standalone CLI and published JSON agree with the installation guide', t => {
+  const template = JSON.parse(readFileSync(new URL('../clients/workbuddy.json', import.meta.url), 'utf8'));
+  assert.deepEqual(template.mcpServers.growthpilot, connectionEntry(endpoint));
+  const {configPath} = fixture(t);
+  const child = spawnSync(process.execPath, [fileURLToPath(new URL('../scripts/configure-workbuddy.mjs', import.meta.url)), '--config', configPath, '--server-url', endpoint], {encoding: 'utf8'});
+  assert.equal(child.status, 0, child.stderr);
+  assert.equal(JSON.parse(child.stdout).status, 'configured_not_authorized');
+  assert.ok(JSON.parse(readFileSync(configPath, 'utf8')).mcpServers.growthpilot);
+});

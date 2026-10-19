@@ -56,7 +56,20 @@ Restart the Claude Code session, open `/mcp`, select GrowthPilot and authenticat
 
 ## WorkBuddy
 
-Follow the [WorkBuddy guide](https://grow.apixstar.com/workbuddy). Merge [clients/workbuddy.json](clients/workbuddy.json) into the active MCP configuration, commonly `~/.workbuddy/mcp.json`, preserving other servers. Enable GrowthPilot in the custom connector settings and complete browser OAuth. WorkBuddy manages authorization and token refresh; no manually copied token is needed. Enable the connector in your task and verify the tools in a new task if needed.
+Follow the [WorkBuddy guide](https://grow.apixstar.com/workbuddy) in a local task with Node.js LTS available. The AI should execute configuration, browser login and verification instead of stopping at instructions. From this repository:
+
+```sh
+node scripts/configure-workbuddy.mjs
+npx --yes --package=mcp-remote@0.15.1 mcp-remote-client https://grow.apixstar.com/mcp --transport http-only --auth-timeout 300
+```
+
+The first command backs up and merges only GrowthPilot into the active `~/.workbuddy/mcp.json`. Pass `--config` for a different confirmed settings file or `--launcher` for the absolute npx executable. It reports `configured_not_authorized` and the exact login command. It does not log in or claim that installation is complete.
+
+The second command starts browser OAuth and lists tools through the same `mcp-remote@0.15.1` bridge used by [clients/workbuddy.json](clients/workbuddy.json). Keep it running while the user signs in and approves access. Inspect the actual tools list; a successful process exit alone is insufficient. Tokens stay in the bridge's local OAuth cache and refresh automatically. Use the same user account, endpoint and cache environment in WorkBuddy.
+
+Enable GrowthPilot in WorkBuddy, load a new task and verify the tools there before claiming the client is connected. Reuse an existing working native OAuth connection instead of installing a duplicate. See the full guide for Windows commands and the ready-to-paste verification prompt.
+
+Validate the configuration helper without accessing real user settings: `node --test test/configure-workbuddy.test.mjs`.
 
 ## Trae Work
 
