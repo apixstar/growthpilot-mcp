@@ -21,7 +21,7 @@ Read https://grow.apixstar.com/claude, install GrowthPilot MCP, help me sign in,
 For WorkBuddy:
 
 ```text
-Read https://grow.apixstar.com/workbuddy, install GrowthPilot MCP, help me sign in, and verify the connection.
+Read https://grow.apixstar.com/workbuddy, install GrowthPilot MCP and help me authorize it. Use your available tools to finish loading and verifying it inside WorkBuddy. If my action is required, explain the specific blocker and minimum step, then resume verification.
 ```
 
 For a local task in Trae Work desktop:
@@ -67,7 +67,7 @@ Before running the first command, replace `--config` with Configuration File Pat
 
 The second command starts browser OAuth and lists tools through the same `mcp-remote@0.15.1` bridge used by [clients/workbuddy.json](clients/workbuddy.json). Keep it running while the user signs in and approves access. Inspect the actual tools list; a successful process exit alone is insufficient. Tokens stay in the bridge's local OAuth cache and refresh automatically. Use the same user account, endpoint and cache environment in WorkBuddy.
 
-After an external file edit, reload the latest configuration in Connectors → Custom connectors → Add MCP and save it through WorkBuddy to refresh the running client's configuration. Preserve every other server. Complete Trust/Enable in MCP Server Management and confirm GrowthPilot's tools appear. A new task alone may still use the old configuration. Check actual callable MCP tools in the conversation, then call `growthpilot_account_get` if available. `list_installed_plugins` lists connector plugins and cannot establish whether a custom MCP server is loaded. If terminal OAuth and tools already work, resume at this client-loading step instead of reinstalling or repeating login. Reuse an existing working native OAuth connection. See the full guide for Windows commands and the handoff prompt if a fresh task is needed.
+The agent should finish client loading with an exposed MCP-management action or permitted desktop control, rather than hand over step 4 by default. After an external file edit, reload the latest configuration in Connectors → Custom connectors → Add MCP and save it through WorkBuddy, preserving every other server. Inspect Trust/Enable in MCP Server Management; ask for confirmation only when the host requires it from the user. If the task lacks a permitted control tool, explain that specific limitation and request the minimum remaining action, then resume verification. Zero interaction cannot be guaranteed for every client. A new task alone may still use the old configuration. Check actual callable MCP tools in the conversation, then call `growthpilot_account_get` if available. `list_installed_plugins` lists connector plugins and cannot establish whether a custom MCP server is loaded. If terminal OAuth and tools already work, resume at this client-loading step instead of reinstalling or repeating login. Reuse an existing working native OAuth connection. See the full guide for Windows commands and the handoff prompt if a fresh task is needed.
 
 Validate the configuration helper without accessing real user settings: `node --test test/configure-workbuddy.test.mjs`.
 
