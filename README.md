@@ -9,18 +9,16 @@ Website traffic, keyword and audience research in your AI conversation.
 Paste this into a local ChatGPT Work / Codex desktop task:
 
 ```text
-Read https://grow.apixstar.com/chatgpt (if unavailable, read https://github.com/apixstar/growthpilot-mcp), install GrowthPilot MCP, help me sign in, and open a new task after verifying the connection.
+Read https://grow.apixstar.com/chatgpt, install GrowthPilot MCP, help me sign in, and open a new task after verifying the connection.
 ```
 
 For Claude Code:
 
 ```text
-Read https://grow.apixstar.com/claude (if unavailable, read https://github.com/apixstar/growthpilot-mcp), install GrowthPilot MCP, help me sign in, and verify the connection.
+Read https://grow.apixstar.com/claude, install GrowthPilot MCP, help me sign in, and verify the connection.
 ```
 
 The guides are public HTML: no account, JavaScript or API key is needed to read them. The AI configures the client; you sign in with Google and approve access in the browser. A client with local execution is needed for automatic installation. Claude web/desktop can use a custom connector instead.
-
-If your AI's web fetcher cannot read the website, the setup steps below are a complete fallback. You can also read the [raw README](https://raw.githubusercontent.com/apixstar/growthpilot-mcp/main/README.md).
 
 ## ChatGPT Work / Codex desktop
 
