@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "growthpilot": {
+      "type": "streamableHttp",
+      "url": "https://grow.apixstar.com/mcp"
+    }
+  }
+}
