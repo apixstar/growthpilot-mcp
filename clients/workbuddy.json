@@ -2,10 +2,7 @@
   "mcpServers": {
     "growthpilot": {
       "type": "http",
-      "url": "https://grow.apixstar.com/mcp",
-      "headers": {
-        "Authorization": "Bearer <access_token>"
-      }
+      "url": "https://grow.apixstar.com/mcp"
     }
   }
 }

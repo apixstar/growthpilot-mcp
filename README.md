@@ -56,19 +56,19 @@ Restart the Claude Code session, open `/mcp`, select GrowthPilot and authenticat
 
 ## WorkBuddy
 
-The [WorkBuddy guide](https://grow.apixstar.com/workbuddy) installs a direct HTTP connection using OAuth DCR, PKCE S256, a localhost browser callback and a Bearer header. Node.js LTS is needed only for setup and token refresh; no MCP bridge runs afterward.
+The [WorkBuddy guide](https://grow.apixstar.com/workbuddy) uses direct HTTP with **WorkBuddy's native OAuth**. Configure only `type: "http"` and the MCP URL; do not paste an access token into a static Authorization header. WorkBuddy owns the access and refresh credentials.
 
 ```sh
 node scripts/configure-workbuddy.mjs --config "/absolute/path/shown/by/WorkBuddy/mcp.json"
 ```
 
-Use Configuration File Path from WorkBuddy's Connectors → Custom connectors → Add MCP editor. Depending on the edition, it may be `~/.workbuddy/mcp.json` or `~/.workbuddy-ai/mcp.json`. The helper refuses ambiguous paths, preserves unrelated settings, backs up the original config, verifies HTTP tools and writes `type: "http"`. Credentials are stored privately beside the config; they are never printed. Keep the command running while the user signs in and grants access. An existing bridge grant can be migrated with `--import-mcp-remote "/absolute/cache/prefix"` (without `_tokens.json`); the helper validates the issuer before reuse.
+Use Configuration File Path from WorkBuddy's Connectors → Custom connectors → Add MCP editor. Depending on the edition, it may be `~/.workbuddy/mcp.json` or `~/.workbuddy-ai/mcp.json`. The helper refuses ambiguous paths, backs up the file, preserves unrelated settings, and migrates GrowthPilot's old bridge or fixed header to HTTP. It makes no network requests and does not read old OAuth caches. Node is needed only to merge the configuration.
 
-The result `configured_client_load_pending` means OAuth and HTTP passed, but WorkBuddy loading remains unverified. Start a fresh WorkBuddy conversation and invoke `growthpilot_account_get` through its actual MCP tool. If unavailable, use supported client refresh or reopen/save the latest configuration in WorkBuddy, inspect Trust/Enable, then test again. Use available permitted tools; ask for user action only for a specific capability limit or user-only confirmation. Never write trust records or use private IPC. A terminal check or `list_installed_plugins` is not evidence of a callable custom MCP.
+`configured_client_load_pending` and `client_oauth_pending` are not connection success. Reload/save the configuration through supported WorkBuddy controls. Complete required Trust confirmation, then use GrowthPilot **Connect** to authorize in the browser. Native OAuth uses PKCE S256 and a localhost callback when the app deep link is rejected. Existing helper/bridge users need a native WorkBuddy authorization once; do not reuse the old `--refresh`, `--login` or `--import-mcp-remote` workflow.
 
-Access tokens expire within **15 minutes**. Static HTTP headers do not auto-refresh. Rerun the helper with `--refresh`, reload the updated config in WorkBuddy and verify again. Use `--login` if the grant expired or was revoked. This direct HTTP workflow does not promise unattended long-term token renewal.
+Start a fresh conversation, discover all seven tools (including `similarweb_query`), and invoke `growthpilot_account_get` through its actual MCP tool. Repeat after the initial **15-minute** token expires, without editing config or running a helper, to verify client-managed renewal. A cached tool list, `list_installed_plugins`, or a terminal check does not prove native availability. Report separately if renewal has not yet been verified.
 
-Validate the helper: `node --test test/configure-workbuddy.test.mjs` (local loopback sockets required for OAuth callback tests).
+Use available permitted tools and ask for user action only for a concrete control limitation or required confirmation. Never write trust records or use private IPC. Validate the installer with `node --test test/configure-workbuddy.test.mjs`.
 
 ## Trae Work
 
