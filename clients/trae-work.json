@@ -1,8 +1,7 @@
 {
   "mcpServers": {
     "growthpilot": {
-      "command": "npx",
-      "args": ["-y", "mcp-remote@0.15.1", "https://grow.apixstar.com/mcp", "--transport", "http-only"]
+      "url": "https://grow.apixstar.com/mcp"
     }
   }
 }

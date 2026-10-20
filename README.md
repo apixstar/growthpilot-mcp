@@ -24,10 +24,10 @@ For WorkBuddy:
 Read https://grow.apixstar.com/workbuddy, install GrowthPilot MCP and help me authorize it. Use your available tools to finish loading and verifying it inside WorkBuddy.
 ```
 
-For a local task in Trae Work desktop:
+For a local task in TRAE desktop (formerly Trae Work):
 
 ```text
-Read https://grow.apixstar.com/trae-work, install GrowthPilot MCP, help me sign in, and verify the connection.
+Read https://grow.apixstar.com/trae-work, install GrowthPilot MCP and help me authorize it. Use your available tools to finish loading and verifying it inside TRAE.
 ```
 
 The guides are public HTML: no account, JavaScript or API key is needed to read them. The AI configures the client; you sign in with Google and approve access in the browser. A client with local execution is needed for automatic installation. Claude web/desktop can use a custom connector instead.
@@ -70,11 +70,17 @@ Start a fresh conversation, discover all seven tools (including `similarweb_quer
 
 Use available permitted tools and ask for user action only for a concrete control limitation or required confirmation. Never write trust records or use private IPC. Validate the installer with `node --test test/configure-workbuddy.test.mjs`.
 
-## Trae Work
+## TRAE / Trae Work
 
-Follow the [Trae Work guide](https://grow.apixstar.com/trae-work) in a local desktop task with Node.js LTS installed. In Avatar → Settings → MCP, choose the Local runtime and Create → Manual configuration. Add [clients/trae-work.json](clients/trae-work.json), then save and enable the server.
+The [TRAE guide](https://grow.apixstar.com/trae-work) uses direct HTTP with **TRAE's native OAuth**, verified on TRAE CN 3.4.4 on macOS. Add [clients/trae-work.json](clients/trae-work.json), which contains only the MCP URL. No Node.js runtime, fixed Authorization header or local bridge is needed.
 
-The configuration uses `mcp-remote@0.15.1` as a local stdio bridge to GrowthPilot's hosted MCP. It handles browser OAuth and token refresh. Keep it running while you sign in and approve access. Start a new local task and verify the tools. This configuration does not apply to a cloud-only runtime. If the installed client supports native remote OAuth, that connection can be used instead of the bridge.
+In TRAE CN 3.4.4, Settings → MCP opens Marketplace → Manage → MCP; choose Add → Manual configuration. Older Trae Work editions use Avatar → Settings → MCP → Local → Create → Manual configuration. Confirm the active configuration before editing a file, back it up privately and preserve unrelated settings. Replace only GrowthPilot's old `mcp-remote` command/args or fixed header. Do not import old credentials or modify internal trust records.
+
+Save/refresh the configuration and enable GrowthPilot, then select **Go to verify (前往验证)** once. Complete browser consent and keep TRAE running for its localhost callback. TRAE owns dynamic client registration, PKCE S256 and token storage. Wait for the current authorization attempt before starting another. If the client reports missing OAuth client information during code exchange, finish or cancel the pending attempt and retry native verification once; report repeated errors or an unsupported edition instead of silently using a bridge.
+
+Use available permitted tools to finish the workflow. A saved configuration is still `configured_client_load_pending` / `client_oauth_pending`. Start a fresh local task, discover all seven tools (including `similarweb_query`), and invoke `growthpilot_account_get` through its actual MCP tool. Search deferred tools; TRAE may prefix names with `mcp_growthpilot_`. Only a successful native call proves readiness.
+
+Repeat the native account call after the initial **15-minute** token expires to verify client-managed renewal, without reauthorizing, editing headers or running a refresh helper. Report connection and renewal results separately. Older Trae Work and cloud-only editions are not covered by the desktop verification.
 
 ## Direct MCP setup
 
