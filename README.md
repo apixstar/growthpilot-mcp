@@ -21,7 +21,7 @@ Read https://grow.apixstar.com/claude, install GrowthPilot MCP, help me sign in,
 For WorkBuddy:
 
 ```text
-Read https://grow.apixstar.com/workbuddy, install GrowthPilot MCP and help me authorize it. Use your available tools to finish loading and verifying it inside WorkBuddy. If my action is required, explain the specific blocker and minimum step, then resume verification.
+Read https://grow.apixstar.com/workbuddy, install GrowthPilot MCP and help me authorize it. Use your available tools to finish loading and verifying it inside WorkBuddy.
 ```
 
 For a local task in Trae Work desktop:
