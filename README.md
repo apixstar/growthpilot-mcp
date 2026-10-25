@@ -1,4 +1,4 @@
-# GrowthPilot MCP
+# APIxstar·Grow plugin
 
 Website traffic, keyword and audience research in your AI conversation.
 
@@ -9,25 +9,25 @@ Website traffic, keyword and audience research in your AI conversation.
 Paste this into a local ChatGPT Work / Codex desktop task:
 
 ```text
-Read https://grow.apixstar.com/chatgpt, install GrowthPilot MCP, help me sign in, and open a new task after verifying the connection.
+Follow https://grow.apixstar.com/chatgpt to install, authorize and verify the APIxstar·Grow plugin for me.
 ```
 
 For Claude Code:
 
 ```text
-Read https://grow.apixstar.com/claude, install GrowthPilot MCP, help me sign in, and verify the connection.
+Follow https://grow.apixstar.com/claude to install, authorize and verify the APIxstar·Grow plugin for me.
 ```
 
 For WorkBuddy:
 
 ```text
-Read https://grow.apixstar.com/workbuddy, install GrowthPilot MCP and help me authorize it. Use your available tools to finish loading and verifying it inside WorkBuddy.
+Follow https://grow.apixstar.com/workbuddy to install, authorize and verify the APIxstar·Grow plugin for me.
 ```
 
 For a local task in TRAE desktop (formerly Trae Work):
 
 ```text
-Read https://grow.apixstar.com/trae-work, install GrowthPilot MCP and help me authorize it. Use your available tools to finish loading and verifying it inside TRAE.
+Follow https://grow.apixstar.com/trae-work to install, authorize and verify the APIxstar·Grow plugin for me.
 ```
 
 The guides are public HTML: no account, JavaScript or API key is needed to read them. The AI configures the client; you sign in with Google and approve access in the browser. A client with local execution is needed for automatic installation. Claude web/desktop can use a custom connector instead.
