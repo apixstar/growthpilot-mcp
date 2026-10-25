@@ -12,10 +12,10 @@ Paste this into a local ChatGPT Work / Codex desktop task:
 Read https://grow.apixstar.com/chatgpt to install APIxStar Grow and sign me in. Check installation and authorization, briefly introduce what you can do, and guide me to start my first website research task in a new session.
 ```
 
-For Claude Code:
+For any session in the Claude Code desktop app:
 
 ```text
-Read https://grow.apixstar.com/claude to install APIxStar Grow and sign me in. Check installation and authorization, briefly introduce what you can do, and guide me to start my first website research task in a new session.
+/goal Read https://grow.apixstar.com/claude to install and use the APIxStar Grow plugin.
 ```
 
 For WorkBuddy:
@@ -30,7 +30,7 @@ For a local task in TRAE desktop (formerly Trae Work):
 Read https://grow.apixstar.com/trae-work to install APIxStar Grow and sign me in. Check installation and authorization, briefly introduce what you can do, and guide me to start my first website research task in a new session.
 ```
 
-The guides are public HTML: no account, JavaScript or API key is needed to read them. The AI configures the client; you sign in with Google and approve access in the browser. A client with local execution is needed for automatic installation. Claude web can use a custom connector instead; local Claude Code Desktop follows the complete installation guide.
+The guides are public: browsers get HTML and AI fetch tools get the same guide as Markdown, with no account, JavaScript or API key needed. The AI configures the client; you sign in with Google and approve access in the browser. A client with local execution is needed for automatic installation. Claude web can use a custom connector instead; local Claude Code Desktop follows the complete installation guide.
 
 ## ChatGPT Work / Codex desktop
 
@@ -113,10 +113,12 @@ This repository distributes the installable client plugin and public installatio
 
 Codex: `codex plugin marketplace upgrade apixstar`, then reinstall the plugin if prompted. Remove with `codex plugin remove growthpilot@apixstar`.
 
-Claude Code: follow the [update instructions](https://grow.apixstar.com/claude). For the default ZIP installation, first stage and inspect the new package, back up and replace its permanent source, then run `claude plugin marketplace update apixstar-download` and `claude plugin update growthpilot@apixstar-download` with the existing scope. Use the actual selector for a retained Git source. Uninstall only on request and start a fresh session to verify an update.
+Claude Code: `claude plugin marketplace update apixstar`, then `claude plugin update growthpilot@apixstar`, and start a new session. Remove with `claude plugin uninstall growthpilot@apixstar`. A test deployment installed from the ZIP uses `apixstar-download` instead; see the [update instructions](https://grow.apixstar.com/claude).
 
 WorkBuddy / TRAE: remove only the APIxStar Grow MCP entry and its two standalone skill directories through supported controls; revoke authorization separately when requested.
 
 Revoke access separately in [Connected apps](https://grow.apixstar.com/console#connections).
+
+Version **1.4.9** installs on Claude Code from this marketplace and ships `scripts/login.sh`, which runs `claude mcp login` in a pseudo-terminal so an agent can complete OAuth sign-in from a shell without a terminal.
 
 Version **1.4.8** keeps public provider names while moving collection routing to the service. Internal channel names are omitted from tool schemas, research responses and progress guidance. Refresh MCP tools and update installed skills before starting a new conversation.

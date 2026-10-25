@@ -12,6 +12,7 @@ export const distributionFiles=[
   'plugins/growthpilot/.codex-plugin/plugin.json',
   'plugins/growthpilot/.claude-plugin/plugin.json',
   'plugins/growthpilot/.mcp.json',
+  'plugins/growthpilot/scripts/login.sh',
   'plugins/growthpilot/skills/account/SKILL.md',
   'plugins/growthpilot/skills/website-research/SKILL.md',
   'plugins/growthpilot/skills/website-research/references/source-selection.md',
