@@ -40,12 +40,38 @@ test('creates an absent file in a confirmed directory and is idempotent', t => {
 });
 
 test('rejects malformed config, name conflicts and duplicate endpoints without writing', t => {
-  for (const original of ['{broken', '[]', '{"mcpServers":[]}', JSON.stringify({mcpServers: {growthpilot: {url: 'https://other.example/mcp'}}}), JSON.stringify({mcpServers: {anotherName: {url: endpoint}}})]) {
+  for (const original of ['{broken', '[]', '{"mcpServers":[]}', JSON.stringify({mcpServers: {growthpilot: {url: 'https://other.example/mcp'}}}), JSON.stringify({mcpServers: {growthpilot: {url: endpoint}, anotherName: {url: endpoint}}})]) {
     const {directory, configPath} = fixture(t, original);
     assert.throws(() => configure({configPath}));
     assert.equal(readFileSync(configPath, 'utf8'), original);
     assert.deepEqual(readdirSync(directory), ['mcp.json']);
   }
+});
+
+test('reuses a native connector under its existing name without resetting client options or authorization identity', async t => {
+  const entry = {type: 'http', url: endpoint, disabled: false, timeout: 45, headers: {'X-Client': 'workbuddy'}};
+  const original = JSON.stringify({mcpServers: {grow: entry, growthpilot: {type: 'http', url: 'https://other.example/mcp'}}});
+  const {configPath, directory} = fixture(t, original);
+  const result = await setup({configPath});
+  assert.equal(result.serverName, 'grow');
+  assert.equal(result.configurationChanged, false);
+  assert.equal(result.backup, null);
+  assert.equal(result.clientLoad, 'not_checked');
+  assert.equal(result.trust, 'not_checked');
+  assert.equal(readFileSync(configPath, 'utf8'), original);
+  assert.deepEqual(readdirSync(directory), ['mcp.json']);
+});
+
+test('migrates an aliased fixed token without losing non-authentication client settings', t => {
+  const original = JSON.stringify({mcpServers: {grow: {type: 'http', url: endpoint, disabled: true, headers: {authorization: 'Bearer expired-secret', 'X-Client': 'workbuddy'}}}});
+  const {configPath} = fixture(t, original);
+  const result = configure({configPath});
+  assert.equal(result.serverName, 'grow');
+  assert.equal(result.configurationChanged, true);
+  assert.equal(readFileSync(result.backup, 'utf8'), original);
+  assert.deepEqual(JSON.parse(readFileSync(configPath, 'utf8')).mcpServers, {grow: {type: 'http', url: endpoint, disabled: true, headers: {'X-Client': 'workbuddy'}}});
+  assert.ok(!JSON.stringify(result).includes('expired-secret'));
+  assert.equal(configure({configPath}).configurationChanged, false);
 });
 
 test('migrates the stdio bridge to HTTP and removes its command/args', t => {

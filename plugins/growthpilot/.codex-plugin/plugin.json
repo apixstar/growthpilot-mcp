@@ -1,13 +1,17 @@
 {
   "name": "growthpilot",
-  "version": "1.0.0",
-  "description": "Website traffic, keywords and audiences in your AI conversation. Sign in and authorize the APIxstar·Grow plugin to get started.",
-  "author": { "name": "Apixstar", "url": "https://github.com/apixstar" },
+  "version": "1.4.5",
+  "description": "Website research and account workflows with bundled skills and APIxStar Grow's hosted MCP. Connect your account with OAuth.",
+  "author": {
+    "name": "Apixstar",
+    "url": "https://github.com/apixstar"
+  },
   "homepage": "https://grow.apixstar.com/connect",
   "repository": "https://github.com/apixstar/growthpilot-mcp",
+  "skills": "./skills/",
   "mcpServers": "./.mcp.json",
   "interface": {
-    "displayName": "GrowthPilot",
+    "displayName": "APIxStar Grow",
     "shortDescription": "Website traffic, keywords and audience research",
     "brandColor": "#bc551d"
   }

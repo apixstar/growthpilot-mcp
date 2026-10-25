@@ -1,13 +1,17 @@
 {
   "name": "apixstar",
-  "owner": { "name": "Apixstar" },
-  "metadata": { "description": "APIxstar·Grow plugins for website research." },
+  "owner": {
+    "name": "Apixstar"
+  },
+  "metadata": {
+    "description": "APIxStar Grow plugins with research skills and hosted MCP tools."
+  },
   "plugins": [
     {
       "name": "growthpilot",
       "source": "./plugins/growthpilot",
-      "description": "Website traffic, keyword and audience research in your AI conversations.",
-      "version": "1.0.0"
+      "description": "Website research and account skills with APIxStar Grow MCP.",
+      "version": "1.4.5"
     }
   ]
 }
