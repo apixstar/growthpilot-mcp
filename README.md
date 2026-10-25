@@ -21,13 +21,13 @@ Read https://grow.apixstar.com/claude to install APIxStar Grow and sign me in. C
 For WorkBuddy:
 
 ```text
-Read https://grow.apixstar.com/workbuddy, install APIxStar Grow MCP and help me authorize it. Use your available tools to finish loading and verifying it inside WorkBuddy.
+Read https://grow.apixstar.com/workbuddy to install APIxStar Grow and sign me in. Check installation and authorization, briefly introduce what you can do, and guide me to start my first website research task in a new session.
 ```
 
 For a local task in TRAE desktop (formerly Trae Work):
 
 ```text
-Read https://grow.apixstar.com/trae-work, install APIxStar Grow MCP and help me authorize it. Use your available tools to finish loading and verifying it inside TRAE.
+Read https://grow.apixstar.com/trae-work to install APIxStar Grow and sign me in. Check installation and authorization, briefly introduce what you can do, and guide me to start my first website research task in a new session.
 ```
 
 The guides are public HTML: no account, JavaScript or API key is needed to read them. The AI configures the client; you sign in with Google and approve access in the browser. A client with local execution is needed for automatic installation. Claude web can use a custom connector instead; local Claude Code Desktop follows the complete installation guide.
@@ -60,31 +60,23 @@ After confirmed installation and authorization, introduce APIxStar Grow and guid
 
 ## WorkBuddy
 
-The [WorkBuddy guide](https://grow.apixstar.com/workbuddy) uses direct HTTP with **WorkBuddy's native OAuth**. Configure only `type: "http"` and the MCP URL; do not paste an access token into a static Authorization header. WorkBuddy owns the access and refresh credentials.
+Follow the [complete WorkBuddy guide](https://grow.apixstar.com/workbuddy) and download its versioned ZIP. Confirm the active MCP configuration through the running client's controls and the skill directory independently through its skill settings or bundled skill-creator. Inspect both installation scripts, then run:
 
 ```sh
-node scripts/configure-workbuddy.mjs --config "/absolute/path/shown/by/WorkBuddy/mcp.json"
+node scripts/configure-workbuddy.mjs --server-url https://grow.apixstar.com/mcp --skills-dir "/absolute/path/to/confirmed/user/skills"
 ```
 
-Use Configuration File Path from WorkBuddy's Connectors → Custom connectors → Add MCP editor. Depending on the edition, it may be `~/.workbuddy/mcp.json` or `~/.workbuddy-ai/mcp.json`. The helper refuses ambiguous paths, backs up the file, preserves unrelated settings, and migrates APIxStar Grow's old bridge or fixed header to HTTP. It makes no network requests and does not read old OAuth caches. Node is needed only to merge the configuration.
+Add `--config "/absolute/path/to/active/mcp.json"` only when necessary. The helper backs up changed configuration, preserves unrelated entries, reuses a matching connection, and installs both complete skills plus `references/source-selection.md`. It does not authorize an account or read credential caches. `configured_client_load_pending` and `client_oauth_pending` mean client state still needs checking, not that login is necessarily missing. Use native Save, Trust and Connect only as the actual client state requires; reuse valid authorization and never put a fixed token in the configuration.
 
-`configured_client_load_pending` and `client_oauth_pending` are not connection success. Reload/save the configuration through supported WorkBuddy controls. Complete required Trust confirmation, then use APIxStar Grow **Connect** to authorize in the browser. Native OAuth uses PKCE S256 and a localhost callback when the app deep link is rejected. Existing helper/bridge users need a native WorkBuddy authorization once; do not reuse the old `--refresh`, `--login` or `--import-mcp-remote` workflow.
-
-Start a fresh conversation, discover all seven tools (including `similarweb_query`), and invoke `growthpilot_account_get` through its actual MCP tool. Repeat after the initial **15-minute** token expires, without editing config or running a helper, to verify client-managed renewal. A cached tool list, `list_installed_plugins`, or a terminal check does not prove native availability. Report separately if renewal has not yet been verified.
-
-Use available permitted tools and ask for user action only for a concrete control limitation or required confirmation. Never write trust records or use private IPC. Validate the installer with `node --test test/configure-workbuddy.test.mjs`.
+Check installation and authorization, briefly introduce the available capabilities, and guide the user to start their first website research task in a **new session**, even if the installation conversation already works. Preserve the project, endpoint, version, server name, confirmed skill paths, pending checks and any existing research goal. Keep the handoff short; no long technical verification prompt is required. In the new session, load both skills and the source-selection reference, discover available tools and call the real `growthpilot_account_get` before research. Do not run a paid query to verify setup; test token renewal only when requested.
 
 ## TRAE / Trae Work
 
-The [TRAE guide](https://grow.apixstar.com/trae-work) uses direct HTTP with **TRAE's native OAuth**, verified on TRAE CN 3.4.4 on macOS. Add [clients/trae-work.json](clients/trae-work.json), which contains only the MCP URL. No Node.js runtime, fixed Authorization header or local bridge is needed.
+Follow the [complete TRAE guide](https://grow.apixstar.com/trae-work). Install both skills with the downloaded `scripts/install-skills.mjs --skills-dir "/absolute/path/to/confirmed/user/skills"`. Confirm the directory from the running client independently of its MCP configuration. TRAE CN uses `~/.trae-cn/skills/` for global skills; other editions may differ. Without Node.js, copy both complete skill folders and preserve their references as described in the guide.
 
-In TRAE CN 3.4.4, Settings → MCP opens Marketplace → Manage → MCP; choose Add → Manual configuration. Older Trae Work editions use Avatar → Settings → MCP → Local → Create → Manual configuration. Confirm the active configuration before editing a file, back it up privately and preserve unrelated settings. Replace only APIxStar Grow's old `mcp-remote` command/args or fixed header. Do not import old credentials or modify internal trust records.
+Merge [clients/trae-work.json](clients/trae-work.json) into the confirmed active configuration, preserving unrelated settings. It contains only the MCP URL. Use TRAE's native authorization, selecting **Go to verify / 前往验证** only when required. Keep one authorization flow active and leave TRAE running for the callback. Do not use the WorkBuddy configuration helper, a fixed token, private IPC or internal trust records in TRAE.
 
-Save/refresh the configuration and enable APIxStar Grow, then select **Go to verify (前往验证)** once. Complete browser consent and keep TRAE running for its localhost callback. TRAE owns dynamic client registration, PKCE S256 and token storage. Wait for the current authorization attempt before starting another. If the client reports missing OAuth client information during code exchange, finish or cancel the pending attempt and retry native verification once; report repeated errors or an unsupported edition instead of silently using a bridge.
-
-Use available permitted tools to finish the workflow. A saved configuration is still `configured_client_load_pending` / `client_oauth_pending`. Start a fresh local task, discover all seven tools (including `similarweb_query`), and invoke `growthpilot_account_get` through its actual MCP tool. Search deferred tools; TRAE may prefix names with `mcp_growthpilot_`. Only a successful native call proves readiness.
-
-Repeat the native account call after the initial **15-minute** token expires to verify client-managed renewal, without reauthorizing, editing headers or running a refresh helper. Report connection and renewal results separately. Older Trae Work and cloud-only editions are not covered by the desktop verification.
+Use the same follow-up as WorkBuddy: check installation and authorization, briefly introduce available capabilities, and guide the first website research task into a **new session / new local task**. Preserve project context and any research goal. The new session loads both skills and the source-selection reference, discovers actual tools (including deferred tools), and calls `growthpilot_account_get` before reporting readiness. Do not assume a fixed tool count; TRAE may prefix tool names with `mcp_growthpilot_`. Resume only pending checks without reinstalling or logging in again. Renewal testing is separate and only runs on request. The previous TRAE CN 3.4.4 native OAuth verification does not constitute a fresh end-to-end test of this workflow.
 
 ## Direct MCP setup
 
@@ -123,6 +115,8 @@ Codex: `codex plugin marketplace upgrade apixstar`, then reinstall the plugin if
 
 Claude Code: follow the [update instructions](https://grow.apixstar.com/claude). For the default ZIP installation, first stage and inspect the new package, back up and replace its permanent source, then run `claude plugin marketplace update apixstar-download` and `claude plugin update growthpilot@apixstar-download` with the existing scope. Use the actual selector for a retained Git source. Uninstall only on request and start a fresh session to verify an update.
 
-WorkBuddy / Trae Work: disable or remove only the APIxStar Grow MCP entry in the client’s connector settings.
+WorkBuddy / TRAE: remove only the APIxStar Grow MCP entry and its two standalone skill directories through supported controls; revoke authorization separately when requested.
 
 Revoke access separately in [Connected apps](https://grow.apixstar.com/console#connections).
+
+Version **1.4.8** keeps public provider names while moving collection routing to the service. Internal channel names are omitted from tool schemas, research responses and progress guidance. Refresh MCP tools and update installed skills before starting a new conversation.
