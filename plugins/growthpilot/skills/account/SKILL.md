@@ -22,6 +22,8 @@ If the tools are missing, report that the current conversation has not loaded th
 
 Use returned allowances and subscription fields as the source of truth. Do not hardcode plan prices, free credits, renewal dates or currency. `growthpilot_billing_get` defaults to the account's current subscription market or `GLOBAL`; request `CN` only when appropriate to the user's request.
 
+Read `credits_per_provider` for query rates and `beta` for the separate daily allowance. Beta resets at `reset_at` in `Asia/Shanghai`; a renewal or upgrade does not reset today's used Beta. `upcoming_memberships` lists paid memberships scheduled for later and is not spendable balance. Distinguish request counts from actual credits consumed.
+
 ## Prepare an explicitly requested change
 
 An account question or exhausted query quota does not authorize purchasing, upgrading, canceling or changing keys.

@@ -1,7 +1,7 @@
 {
-  "name": "apixstar",
+  "name": "apixstar-download",
   "interface": {
-    "displayName": "Apixstar"
+    "displayName": "Apixstar · Local download"
   },
   "plugins": [
     {

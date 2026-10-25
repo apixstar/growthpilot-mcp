@@ -1,5 +1,5 @@
 {
-  "name": "apixstar",
+  "name": "apixstar-download",
   "owner": {
     "name": "Apixstar"
   },
@@ -11,7 +11,7 @@
       "name": "growthpilot",
       "source": "./plugins/growthpilot",
       "description": "Website research and account skills with APIxStar Grow MCP.",
-      "version": "1.4.9"
+      "version": "1.4.10"
     }
   ]
 }
